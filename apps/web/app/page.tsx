@@ -13,7 +13,7 @@ export default function Home() {
   const {
     status,
     isLoading,
-    isOperating,
+    operationType,
     error,
     toasts,
     removeToast,
@@ -82,7 +82,7 @@ export default function Home() {
                   onStop={stopServer}
                   onRefresh={refresh}
                   isRefreshing={isLoading}
-                  isOperating={isOperating}
+                  operationType={operationType}
                 />
               </div>
 

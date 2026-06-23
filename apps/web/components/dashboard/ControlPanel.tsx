@@ -10,7 +10,7 @@ interface ControlPanelProps {
   onStop: () => void;
   onRefresh: () => void;
   isRefreshing?: boolean;
-  isOperating?: boolean;
+  operationType?: "starting" | "stopping" | null;
 }
 
 export function ControlPanel({
@@ -19,7 +19,7 @@ export function ControlPanel({
   onStop,
   onRefresh,
   isRefreshing = false,
-  isOperating = false,
+  operationType = null,
 }: ControlPanelProps) {
   const { ec2, minecraft } = status;
 
@@ -55,10 +55,10 @@ export function ControlPanel({
           {/* Start Server Button */}
           <Button
             onClick={onStart}
-            disabled={ec2.state !== "stopped" || isRefreshing || isOperating}
+            disabled={ec2.state !== "stopped" || isRefreshing || operationType !== null}
             className="h-11 bg-emerald-600 hover:bg-emerald-500 disabled:bg-neutral-800 disabled:text-neutral-500 transition-all font-semibold gap-2 rounded-lg cursor-pointer"
           >
-            {isOperating ? (
+            {operationType === "starting" ? (
               <>
                 <RefreshCw className="w-4 h-4 animate-spin" />
                 Starting...
@@ -74,18 +74,27 @@ export function ControlPanel({
           {/* Stop Server Button */}
           <Button
             onClick={onStop}
-            disabled={ec2.state !== "running" || minecraft.state !== "online" || isRefreshing || isOperating}
+            disabled={ec2.state !== "running" || minecraft.state !== "online" || isRefreshing || operationType !== null}
             variant="destructive"
             className="h-11 bg-rose-600/90 hover:bg-rose-500 disabled:bg-neutral-800 disabled:text-neutral-500 transition-all font-semibold gap-2 rounded-lg cursor-pointer"
           >
-            <Square className="w-4 h-4" />
-            Stop Server
+            {operationType === "stopping" ? (
+              <>
+                <RefreshCw className="w-4 h-4 animate-spin" />
+                Stopping...
+              </>
+            ) : (
+              <>
+                <Square className="w-4 h-4" />
+                Stop Server
+              </>
+            )}
           </Button>
 
           {/* Refresh Button */}
           <Button
             onClick={onRefresh}
-            disabled={isRefreshing || isOperating}
+            disabled={isRefreshing || operationType !== null}
             variant="outline"
             className="h-11 col-span-2 border-neutral-800 bg-neutral-900/50 hover:bg-neutral-800 text-neutral-300 hover:text-neutral-50 transition-all font-semibold gap-2 rounded-lg cursor-pointer"
           >

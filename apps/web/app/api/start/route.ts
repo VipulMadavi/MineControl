@@ -39,54 +39,92 @@ export async function POST() {
   const config = loadConfig();
   const serverAddress = config.minecraft.server_address;
 
-  // 3. Pre-flight check: already running & online
+  // 3. Query current status
+  let ec2Info;
+  let minecraftInfo;
   try {
-    const [ec2Info, minecraftInfo] = await Promise.all([
+    const statusResult = await Promise.all([
       getInstanceStatus(instanceId),
       getMinecraftInfo(serverAddress, 2500),
     ]);
-
-    if (ec2Info.state === "running" && minecraftInfo.online) {
-      return NextResponse.json({ status: "already_running" });
-    }
-  } catch (err) {
-    console.warn("[START] Pre-flight status query warning:", err);
-  }
-
-  // 4. Set start lock and execute workflow
-  operationLock.set("starting");
-
-  try {
-    console.log("[START] Starting EC2");
-    const ec2Status = await getInstanceStatus(instanceId);
-    
-    if (ec2Status.state === "stopped") {
-      await startInstance(instanceId);
-    }
-
-    if (ec2Status.state !== "running") {
-      console.log("[START] Waiting for instance");
-      await waitForInstanceRunning(instanceId, 300000, 5000);
-    }
-
-    console.log("[START] Waiting for SSM");
-    const ssmWaitSeconds = config.timeouts.ssm_wait_seconds || 60;
-    await waitForSSM(instanceId, ssmWaitSeconds * 1000, 5000);
-
-    console.log("[START] Executing start.sh");
-    await startMinecraft(instanceId);
-
-    console.log("[START] Waiting for Minecraft");
-    const startupWaitSeconds = config.timeouts.startup_wait_seconds || 300;
-    await waitForMinecraftOnline(serverAddress, startupWaitSeconds * 1000, 5000);
-
-    console.log("[START] Startup complete");
-    return NextResponse.json({ status: "online" });
+    ec2Info = statusResult[0];
+    minecraftInfo = statusResult[1];
   } catch (error) {
     const err = error as Error;
-    console.error("[START] Failed to start server:", err.message, err);
-    return NextResponse.json({ status: "failed", message: err.message });
-  } finally {
-    operationLock.set("idle");
+    console.error("[START] Failed pre-flight status check:", err.message, err);
+    return NextResponse.json({ status: "failed", message: `Failed pre-flight status check: ${err.message}` });
+  }
+
+  // 4. Implement Decision Matrix
+  if (ec2Info.state === "running") {
+    if (minecraftInfo.online) {
+      console.log("[START] Server already running and online.");
+      return NextResponse.json({ status: "already_running" });
+    }
+
+    // EC2 is running but Minecraft is offline: Trigger recovery flow
+    operationLock.set("starting");
+    try {
+      console.log("[RECOVERY] EC2 already running");
+      console.log("[RECOVERY] Minecraft offline");
+
+      console.log("[RECOVERY] Waiting for SSM");
+      const ssmWaitSeconds = config.timeouts.ssm_wait_seconds || 60;
+      try {
+        await waitForSSM(instanceId, ssmWaitSeconds * 1000, 5000);
+      } catch (ssmError) {
+        const ssmErr = ssmError as Error;
+        console.error("[RECOVERY] SSM unavailable:", ssmErr.message);
+        return NextResponse.json({ status: "failed", message: "SSM unavailable" });
+      }
+
+      console.log("[RECOVERY] Executing start.sh");
+      await startMinecraft(instanceId);
+
+      console.log("[START] Waiting for Minecraft");
+      const startupWaitSeconds = config.timeouts.startup_wait_seconds || 300;
+      await waitForMinecraftOnline(serverAddress, startupWaitSeconds * 1000, 5000);
+
+      console.log("[RECOVERY] Minecraft recovered");
+      return NextResponse.json({ status: "minecraft_restarted" });
+    } catch (error) {
+      const err = error as Error;
+      console.error("[RECOVERY] Failed to recover Minecraft:", err.message, err);
+      return NextResponse.json({ status: "failed", message: err.message });
+    } finally {
+      operationLock.set("idle");
+    }
+  } else {
+    // EC2 is off (or not running) -> Run full startup sequence
+    operationLock.set("starting");
+    try {
+      console.log("[START] Starting EC2");
+      if (ec2Info.state === "stopped") {
+        await startInstance(instanceId);
+      }
+
+      console.log("[START] Waiting for instance");
+      await waitForInstanceRunning(instanceId, 300000, 5000);
+
+      console.log("[START] Waiting for SSM");
+      const ssmWaitSeconds = config.timeouts.ssm_wait_seconds || 60;
+      await waitForSSM(instanceId, ssmWaitSeconds * 1000, 5000);
+
+      console.log("[START] Executing start.sh");
+      await startMinecraft(instanceId);
+
+      console.log("[START] Waiting for Minecraft");
+      const startupWaitSeconds = config.timeouts.startup_wait_seconds || 300;
+      await waitForMinecraftOnline(serverAddress, startupWaitSeconds * 1000, 5000);
+
+      console.log("[START] Startup complete");
+      return NextResponse.json({ status: "online" });
+    } catch (error) {
+      const err = error as Error;
+      console.error("[START] Failed to start server:", err.message, err);
+      return NextResponse.json({ status: "failed", message: err.message });
+    } finally {
+      operationLock.set("idle");
+    }
   }
 }

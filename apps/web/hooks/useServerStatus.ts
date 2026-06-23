@@ -17,7 +17,7 @@ export interface ToastItem {
 }
 
 export function useServerStatus() {
-  const [isOperating, setIsOperating] = useState(false);
+  const [operationType, setOperationType] = useState<"starting" | "stopping" | null>(null);
   const [toasts, setToasts] = useState<ToastItem[]>([]);
 
   const { data, error, isLoading, mutate } = useSWR<ServerStatus>("/api/status", fetcher, {
@@ -42,8 +42,8 @@ export function useServerStatus() {
   };
 
   const startServer = async () => {
-    if (isOperating) return;
-    setIsOperating(true);
+    if (operationType) return;
+    setOperationType("starting");
     try {
       const res = await fetch("/api/start", { method: "POST" });
       if (!res.ok) {
@@ -52,6 +52,8 @@ export function useServerStatus() {
       const result = await res.json();
       if (result.status === "online") {
         addToast("Server started successfully.", "success");
+      } else if (result.status === "minecraft_restarted") {
+        addToast("Minecraft server recovered successfully.", "success");
       } else if (result.status === "already_running") {
         addToast("Server is already running.", "info");
       } else if (result.status === "already_starting") {
@@ -65,19 +67,45 @@ export function useServerStatus() {
       console.error("[useServerStatus] Start server error:", err);
       addToast("Failed to start server.", "error");
     } finally {
-      setIsOperating(false);
+      setOperationType(null);
       mutate();
     }
   };
 
-  const stopServer = () => {
-    console.log("Stop server action triggered (not implemented in Phase 5)");
+  const stopServer = async () => {
+    if (operationType) return;
+    setOperationType("stopping");
+    try {
+      const res = await fetch("/api/stop", { method: "POST" });
+      if (!res.ok) {
+        throw new Error("Network request failed.");
+      }
+      const result = await res.json();
+      if (result.status === "stopped") {
+        addToast("Server stopped successfully.", "success");
+      } else if (result.status === "already_off") {
+        addToast("Server is already stopped.", "info");
+      } else if (result.status === "startup_in_progress") {
+        addToast("Failed to stop: startup is in progress.", "warning");
+      } else if (result.status === "already_stopping") {
+        addToast("Server shutdown is already in progress.", "info");
+      } else {
+        addToast(`Failed to stop server: ${result.message || "Unknown error"}`, "error");
+      }
+    } catch (err) {
+      console.error("[useServerStatus] Stop server error:", err);
+      addToast("Failed to stop server.", "error");
+    } finally {
+      setOperationType(null);
+      mutate();
+    }
   };
 
   return {
     status: data || null,
     isLoading: isLoading && !data,
-    isOperating,
+    isOperating: operationType !== null,
+    operationType,
     error: error ? "Unable to retrieve server status." : null,
     toasts,
     removeToast,
