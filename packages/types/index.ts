@@ -1,16 +1,36 @@
-export type EC2State =
-  | "pending"
-  | "running"
-  | "stopping"
-  | "stopped"
-  | "shutting-down"
-  | "terminated";
+import { z } from "zod";
 
-export type MinecraftState =
-  | "online"
-  | "offline"
-  | "starting"
-  | "stopping";
+export const EC2StateSchema = z.enum([
+  "pending",
+  "running",
+  "stopping",
+  "stopped",
+  "shutting-down",
+  "terminated"
+]);
+export type EC2State = z.infer<typeof EC2StateSchema>;
+
+export const MinecraftStateSchema = z.enum([
+  "online",
+  "offline",
+  "starting",
+  "stopping"
+]);
+export type MinecraftState = z.infer<typeof MinecraftStateSchema>;
+
+export const ServerStatusSchema = z.object({
+  ec2: z.object({
+    state: EC2StateSchema,
+    uptime: z.string(),
+  }),
+  minecraft: z.object({
+    state: MinecraftStateSchema,
+    players: z.number().int().nonnegative(),
+    maxPlayers: z.number().int().nonnegative(),
+    latency: z.number().int().nullable(),
+  }),
+});
+export type ServerStatus = z.infer<typeof ServerStatusSchema>;
 
 export interface DashboardStatus {
   ec2State: EC2State;
@@ -21,7 +41,10 @@ export interface DashboardStatus {
   uptimeSeconds: number;
 }
 
-export interface AutoStopConfig {
-  enabled: boolean;
-  maxIdleTicks: number;
+
+export interface MinecraftInfo {
+  online: boolean;
+  players: number;
+  maxPlayers: number;
+  latency: number | null;
 }

@@ -4,5 +4,15 @@
   "private": true,
   "main": "index.ts",
   "types": "index.ts",
-  "dependencies": {}
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@aws-sdk/client-ec2": "^3.500.0",
+    "@aws-sdk/client-ssm": "^3.500.0",
+    "@minecontrol/types": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0"
+  }
 }
