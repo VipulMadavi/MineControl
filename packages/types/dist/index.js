@@ -14,7 +14,8 @@ exports.MinecraftStateSchema = zod_1.z.enum([
     "online",
     "offline",
     "starting",
-    "stopping"
+    "stopping",
+    "recovery"
 ]);
 exports.ServerStatusSchema = zod_1.z.object({
     ec2: zod_1.z.object({

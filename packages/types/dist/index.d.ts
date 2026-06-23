@@ -13,6 +13,7 @@ export declare const MinecraftStateSchema: z.ZodEnum<{
     online: "online";
     offline: "offline";
     starting: "starting";
+    recovery: "recovery";
 }>;
 export type MinecraftState = z.infer<typeof MinecraftStateSchema>;
 export declare const ServerStatusSchema: z.ZodObject<{
@@ -33,6 +34,7 @@ export declare const ServerStatusSchema: z.ZodObject<{
             online: "online";
             offline: "offline";
             starting: "starting";
+            recovery: "recovery";
         }>;
         players: z.ZodNumber;
         maxPlayers: z.ZodNumber;

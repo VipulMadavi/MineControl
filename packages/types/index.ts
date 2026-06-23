@@ -14,7 +14,8 @@ export const MinecraftStateSchema = z.enum([
   "online",
   "offline",
   "starting",
-  "stopping"
+  "stopping",
+  "recovery"
 ]);
 export type MinecraftState = z.infer<typeof MinecraftStateSchema>;
 

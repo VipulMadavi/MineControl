@@ -26,6 +26,8 @@ export function DashboardGrid({ status }: DashboardGridProps) {
         return <Badge className="bg-amber-500/10 text-amber-400 border border-amber-500/20 shadow-[0_0_8px_rgba(245,158,11,0.1)] animate-pulse capitalize">Starting</Badge>;
       case "stopping":
         return <Badge className="bg-orange-500/10 text-orange-400 border border-orange-500/20 shadow-[0_0_8px_rgba(249,115,22,0.1)] animate-pulse capitalize">Stopping</Badge>;
+      case "recovery":
+        return <Badge className="bg-amber-500/10 text-amber-400 border border-amber-500/20 shadow-[0_0_8px_rgba(245,158,11,0.1)] animate-pulse capitalize">⚠ Recovery Mode</Badge>;
       default:
         return <Badge variant="destructive" className="bg-rose-500/10 text-rose-400 border border-rose-500/20 shadow-[0_0_8px_rgba(244,63,94,0.1)] capitalize">Offline</Badge>;
     }
@@ -38,6 +40,7 @@ export function DashboardGrid({ status }: DashboardGridProps) {
         return "text-emerald-500 bg-emerald-500";
       case "starting":
       case "stopping":
+      case "recovery":
         return "text-amber-500 bg-amber-500";
       default:
         return "text-rose-500 bg-rose-500";
@@ -64,7 +67,7 @@ export function DashboardGrid({ status }: DashboardGridProps) {
       <StatusCard
         title="Server Status"
         value={minecraft.state}
-        description="Current game server loop state"
+        description={minecraft.state === "recovery" ? "Minecraft server not detected. EC2 will automatically shut down if the server remains offline." : "Current game server loop state"}
         icon={<Server className="w-5 h-5 text-emerald-400" />}
         badge={getMinecraftBadge()}
         indicatorColor={getMinecraftIndicator()}

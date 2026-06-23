@@ -49,12 +49,14 @@ export function OverviewPanel({ status }: OverviewPanelProps) {
               className={`capitalize border ${
                 minecraft.state === "online"
                   ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                  : minecraft.state === "starting"
+                  : minecraft.state === "starting" || minecraft.state === "recovery"
                   ? "bg-amber-500/10 text-amber-400 border-amber-500/20 animate-pulse"
+                  : minecraft.state === "stopping"
+                  ? "bg-orange-500/10 text-orange-400 border-orange-500/20 animate-pulse"
                   : "bg-rose-500/10 text-rose-400 border-rose-500/20"
               }`}
             >
-              {minecraft.state}
+              {minecraft.state === "recovery" ? "Recovery Mode" : minecraft.state}
             </Badge>
           </div>
         </CardContent>

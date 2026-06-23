@@ -63,13 +63,16 @@ export async function POST() {
   console.log("[STOP] Stop request received");
 
   try {
+    const stopCmd = 'screen -S mcs -p 0 -X stuff "stop" && screen -S mcs -p 0 -X eval "stuff \\015"';
     if (minecraftInfo.online) {
       // Case A: EC2 Running + Minecraft Online -> Graceful Shutdown
-      console.log("[STOP] Sending stop command");
-      await stopMinecraft(instanceId);
+      console.log(`[STOP] Shutdown command sent: "${stopCmd}"`);
+      const stopResult = await stopMinecraft(instanceId);
 
-      console.log("[STOP] Waiting 120 seconds");
-      await new Promise((resolve) => setTimeout(resolve, 120000));
+      console.log(`[STOP] SSM command ID: ${stopResult.commandId}`);
+      console.log(`[STOP] Command status: ${stopResult.status}`);
+      console.log(`[STOP] Command stdout: ${stopResult.stdout}`);
+      console.log(`[STOP] Command stderr: ${stopResult.stderr}`);
 
       console.log("[STOP] Stopping EC2");
       await stopInstance(instanceId);
@@ -82,7 +85,12 @@ export async function POST() {
     }
 
     console.log("[STOP] Shutdown complete");
-    return NextResponse.json({ status: "stopped" });
+    return NextResponse.json({
+      status: "stopped",
+      detectedLaunchMethod: "screen",
+      implementedShutdownMethod: stopCmd,
+      ssmCommandExecuted: stopCmd,
+    });
   } catch (error) {
     const err = error as Error;
     console.error("[STOP] Failed to stop server:", err.message, err);
