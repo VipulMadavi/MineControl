@@ -2,8 +2,8 @@ import { EC2Client } from "@aws-sdk/client-ec2";
 import { SSMClient } from "@aws-sdk/client-ssm";
 
 const region = process.env.AWS_REGION || "ap-south-1";
-const accessKeyId = process.env.AWS_ACCESS_KEY_ID || process.env.AWS_ACCESS_KEY;
-const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY || process.env.AWS_SECRET_KEY;
+const accessKeyId = process.env.AWS_ACCESS_KEY_ID;
+const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
 
 const clientConfig = {
   region,

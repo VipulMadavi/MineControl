@@ -8,20 +8,20 @@
 
 const REQUIRED_ENV_VARS = [
   // AWS
-  "AWS_ACCESS_KEY",
-  "AWS_SECRET_KEY",
+  "AWS_ACCESS_KEY_ID",
+  "AWS_SECRET_ACCESS_KEY",
+  "AWS_REGION",
   "INSTANCE_ID",
   // Auth
   "DISCORD_CLIENT_ID",
   "DISCORD_CLIENT_SECRET",
   "NEXTAUTH_SECRET",
   "NEXTAUTH_URL",
+  // Discord Webhook
+  "DISCORD_WEBHOOK_URL",
 ] as const;
 
-const OPTIONAL_ENV_VARS = [
-  "DISCORD_WEBHOOK_URL", // Optional: audit logging disabled if absent
-  "AWS_REGION",          // Defaults to ap-south-1
-] as const;
+const OPTIONAL_ENV_VARS = [] as const;
 
 export interface EnvValidationResult {
   valid: boolean;

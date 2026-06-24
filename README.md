@@ -53,15 +53,15 @@ Open [http://localhost:3000](http://localhost:3000).
 
 | Variable | Required | Description |
 |---|---|---|
-| `AWS_ACCESS_KEY` | ✅ | IAM access key with EC2 + SSM permissions |
-| `AWS_SECRET_KEY` | ✅ | IAM secret key |
+| `AWS_ACCESS_KEY_ID` | ✅ | IAM access key with EC2 + SSM permissions |
+| `AWS_SECRET_ACCESS_KEY` | ✅ | IAM secret key |
 | `INSTANCE_ID` | ✅ | EC2 instance ID (e.g. `i-0abc123def456`) |
-| `AWS_REGION` | ⬜ | AWS region (defaults to `ap-south-1`) |
+| `AWS_REGION` | ✅ | AWS region (e.g. `ap-south-1`) |
 | `DISCORD_CLIENT_ID` | ✅ | Discord OAuth application client ID |
 | `DISCORD_CLIENT_SECRET` | ✅ | Discord OAuth application client secret |
 | `NEXTAUTH_SECRET` | ✅ | Random secret — generate with `openssl rand -base64 32` |
 | `NEXTAUTH_URL` | ✅ | Full URL of the deployment (e.g. `https://your-app.vercel.app`) |
-| `DISCORD_WEBHOOK_URL` | ⬜ | Discord webhook for audit logs (optional) |
+| `DISCORD_WEBHOOK_URL` | ✅ | Discord webhook for audit logs |
 
 > **Security**: Never commit `.env` to version control. It is listed in `.gitignore`.
 

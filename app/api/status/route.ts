@@ -11,6 +11,7 @@ import { formatUptime } from "@/lib/format-uptime";
 import { operationLock } from "@/lib/operation-lock";
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 export async function GET() {
   // 1. Session authorization

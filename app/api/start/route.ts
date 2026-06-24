@@ -20,6 +20,7 @@ import {
 } from "@/lib/discord/webhook";
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 export async function POST() {
   // 1. Session authorization
