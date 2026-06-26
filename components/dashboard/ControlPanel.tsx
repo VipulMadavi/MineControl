@@ -1,7 +1,10 @@
+"use client";
+
 import * as React from "react";
 import { ServerStatus } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { ConfirmDialog } from "@/components/ui/alert-dialog";
 import { RefreshCw, Sliders, Clock } from "lucide-react";
 
 interface ControlPanelProps {
@@ -26,6 +29,7 @@ export function ControlPanel({
   lastUpdated = null,
 }: ControlPanelProps) {
   const { ec2, minecraft } = status;
+  const [confirmStopOpen, setConfirmStopOpen] = React.useState(false);
 
   const formatTime = (date: Date) =>
     date.toLocaleTimeString("en-IN", {
@@ -95,7 +99,7 @@ export function ControlPanel({
           {/* Stop Server */}
           <Button
             id="btn-stop-server"
-            onClick={onStop}
+            onClick={() => setConfirmStopOpen(true)}
             disabled={ec2.state !== "running" || minecraft.state !== "online" || isRefreshing || operationType !== null}
             variant="destructive"
             className="h-12 sm:h-12 bg-rose-600/90 hover:bg-rose-500 text-white disabled:bg-neutral-200 dark:disabled:bg-neutral-800/80 disabled:text-neutral-400 dark:disabled:text-neutral-500 transition-all font-semibold gap-2 rounded-lg cursor-pointer text-sm touch-manipulation"
@@ -135,6 +139,23 @@ export function ControlPanel({
         </span>
         <span className="ml-auto text-[10px] text-muted-foreground/30 font-mono">Auto · 30s</span>
       </CardFooter>
+
+      <ConfirmDialog
+        open={confirmStopOpen}
+        onOpenChange={setConfirmStopOpen}
+        title="Stop the Minecraft server?"
+        description={
+          <>
+            This will stop the Minecraft application and shut down the EC2
+            instance ({ec2.state} / {minecraft.state}). Players will be
+            disconnected and the world saved before shutdown.
+          </>
+        }
+        confirmLabel="Stop Server"
+        cancelLabel="Cancel"
+        destructive
+        onConfirm={onStop}
+      />
     </Card>
   );
 }

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import useSWR from "swr";
 import { ServerStatus } from "@/types";
+import { useActivityLog } from "@/hooks/useActivityLog";
 
 const fetcher = async (url: string): Promise<ServerStatus> => {
   const res = await fetch(url);
@@ -22,6 +23,7 @@ export function useServerStatus() {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [tabVisible, setTabVisible] = useState(true);
+  const { activity, logActivity, clearActivity } = useActivityLog();
 
   // Smart refresh: pause when tab is hidden
   useEffect(() => {
@@ -111,10 +113,9 @@ export function useServerStatus() {
         throw new Error("Network request failed.");
       }
       const result = await res.json();
-      if (result.status === "online") {
+      if (result.status === "online" || result.status === "minecraft_restarted") {
         addToast("✅ Server started successfully", "success");
-      } else if (result.status === "minecraft_restarted") {
-        addToast("✅ Server started successfully", "success");
+        logActivity("start", "success", "Server started successfully");
       } else if (result.status === "already_running") {
         addToast("Server is already running.", "info");
       } else if (result.status === "already_starting") {
@@ -123,10 +124,12 @@ export function useServerStatus() {
         addToast("Failed to start server: shutdown is in progress.", "warning");
       } else {
         addToast(`Failed to start server: ${result.message || "Unknown error"}`, "error");
+        logActivity("start", "error", result.message || "Failed to start server");
       }
     } catch (err) {
       console.error("[useServerStatus] Start server error:", err);
       addToast("Failed to start server.", "error");
+      logActivity("start", "error", "Failed to start server");
     } finally {
       setOperationType(null);
       mutate().then(() => setLastUpdated(new Date()));
@@ -144,6 +147,7 @@ export function useServerStatus() {
       const result = await res.json();
       if (result.status === "stopped") {
         addToast("🛑 Server stopped successfully", "success");
+        logActivity("stop", "success", "Server stopped successfully");
       } else if (result.status === "already_off") {
         addToast("Server is already stopped.", "info");
       } else if (result.status === "startup_in_progress") {
@@ -152,10 +156,12 @@ export function useServerStatus() {
         addToast("Server shutdown is already in progress.", "info");
       } else {
         addToast(`Failed to stop server: ${result.message || "Unknown error"}`, "error");
+        logActivity("stop", "error", result.message || "Failed to stop server");
       }
     } catch (err) {
       console.error("[useServerStatus] Stop server error:", err);
       addToast("Failed to stop server.", "error");
+      logActivity("stop", "error", "Failed to stop server");
     } finally {
       setOperationType(null);
       mutate().then(() => setLastUpdated(new Date()));
@@ -175,5 +181,7 @@ export function useServerStatus() {
     startServer,
     stopServer,
     refresh,
+    activity,
+    clearActivity,
   };
 }

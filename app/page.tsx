@@ -6,6 +6,7 @@ import { useServerStatus } from "@/hooks/useServerStatus";
 import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
 import { ControlPanel } from "@/components/dashboard/ControlPanel";
 import { EC2InstanceCard } from "@/components/dashboard/EC2InstanceCard";
+import { RecentActivity } from "@/components/dashboard/RecentActivity";
 import { DashboardSkeleton } from "@/components/dashboard/DashboardSkeleton";
 import { UserMenu } from "@/components/user-menu";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -23,6 +24,7 @@ export default function Home() {
     startServer,
     stopServer,
     refresh,
+    activity,
   } = useServerStatus();
 
   return (
@@ -83,17 +85,22 @@ export default function Home() {
             {/* Full-width EC2 Card */}
             <EC2InstanceCard status={status} />
 
-            {/* Full-width Operations Panel */}
-            <ControlPanel
-              status={status}
-              onStart={startServer}
-              onStop={stopServer}
-              onRefresh={refresh}
-              isRefreshing={isLoading}
-              operationType={operationType}
-              operationStep={operationStep}
-              lastUpdated={lastUpdated}
-            />
+            {/* Operations + Recent Activity — stack on mobile, 2-col on lg */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 sm:gap-6 md:gap-8 items-start">
+              <div className="lg:col-span-2">
+                <ControlPanel
+                  status={status}
+                  onStart={startServer}
+                  onStop={stopServer}
+                  onRefresh={refresh}
+                  isRefreshing={isLoading}
+                  operationType={operationType}
+                  operationStep={operationStep}
+                  lastUpdated={lastUpdated}
+                />
+              </div>
+              <RecentActivity activity={activity} />
+            </div>
           </>
         )}
 
