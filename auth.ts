@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import Discord from "next-auth/providers/discord";
 
-declare const require: any;
+declare const require: NodeRequire;
 
 // Load monorepo root .env file manually ONLY in Node.js server runtime
 if (typeof window === "undefined" && process.env.NEXT_RUNTIME !== "edge") {
@@ -28,8 +28,8 @@ if (typeof window === "undefined" && process.env.NEXT_RUNTIME !== "edge") {
         break;
       }
     }
-  } catch (err: any) {
-    console.error("[auth] Error loading manual env:", err.message);
+  } catch (err) {
+    console.error("[auth] Error loading manual env:", (err as Error).message);
   }
 }
 
@@ -76,8 +76,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           const config = loadConfig();
           const authorizedUsers = config.permissions.authorized_users;
           token.isAuthorized = authorizedUsers.includes(profile.id as string);
-        } catch (error: any) {
-          console.error("[auth] Failed config validation in jwt callback:", error.message);
+        } catch (error) {
+          console.error("[auth] Failed config validation in jwt callback:", (error as Error).message);
           token.isAuthorized = false;
         }
       }

@@ -41,7 +41,7 @@ export function useServerStatus() {
 
   // Operation step sequencing
   useEffect(() => {
-    let timers: NodeJS.Timeout[] = [];
+    const timers: NodeJS.Timeout[] = [];
 
     if (operationType === "starting") {
       setOperationStep("⏳ Starting EC2...");

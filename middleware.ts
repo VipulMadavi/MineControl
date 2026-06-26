@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
 import { NextResponse } from "next/server";
 
-export default auth((req: any) => {
+export default auth((req) => {
   const { nextUrl } = req;
   const isLoggedIn = !!req.auth;
 
@@ -48,6 +48,6 @@ export const config = {
      * - favicon.ico (favicon file)
      * - png/svg/jpg (static images)
      */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.png$|.*\\.svg$|.*\\.jpg$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|.*\.png$|.*\.svg$|.*\.jpg$).*)",
   ],
 };
