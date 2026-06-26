@@ -7,6 +7,7 @@ import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
 import { ControlPanel } from "@/components/dashboard/ControlPanel";
 import { EC2InstanceCard } from "@/components/dashboard/EC2InstanceCard";
 import { RecentActivity } from "@/components/dashboard/RecentActivity";
+import { AutoStopCard } from "@/components/dashboard/AutoStopCard";
 import { DashboardSkeleton } from "@/components/dashboard/DashboardSkeleton";
 import { UserMenu } from "@/components/user-menu";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -26,6 +27,8 @@ export default function Home() {
     refresh,
     activity,
     clearActivity,
+    toggleAutostop,
+    setMaintenance,
   } = useServerStatus();
 
   return (
@@ -86,9 +89,9 @@ export default function Home() {
             {/* Full-width EC2 Card */}
             <EC2InstanceCard status={status} />
 
-            {/* Operations + Recent Activity — stack on mobile, 2-col on lg */}
+            {/* Auto-Stop + Control Panel + Activity — responsive grid */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 sm:gap-6 md:gap-8 items-start">
-              <div className="lg:col-span-2">
+              <div className="lg:col-span-2 flex flex-col gap-5 sm:gap-6 md:gap-8">
                 <ControlPanel
                   status={status}
                   onStart={startServer}
@@ -98,6 +101,11 @@ export default function Home() {
                   operationType={operationType}
                   operationStep={operationStep}
                   lastUpdated={lastUpdated}
+                />
+                <AutoStopCard
+                  autostop={status.autostop}
+                  onToggle={toggleAutostop}
+                  onSetMaintenance={setMaintenance}
                 />
               </div>
               <RecentActivity activity={activity} onClear={clearActivity} />

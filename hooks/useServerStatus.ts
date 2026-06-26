@@ -169,6 +169,54 @@ export function useServerStatus() {
     }
   };
 
+  const toggleAutostop = async () => {
+    try {
+      const res = await fetch("/api/autostop/toggle", { method: "POST" });
+      if (!res.ok) throw new Error("Request failed");
+      const result = await res.json();
+      if (result.success) {
+        const state = result.enabled ? "enabled" : "disabled";
+        addToast(`Auto-stop ${state}`, result.enabled ? "success" : "warning");
+        logActivity("refresh", "info", `Auto-stop ${state}`);
+      } else {
+        addToast(result.error || "Failed to toggle auto-stop", "error");
+      }
+    } catch (err) {
+      console.error("[useServerStatus] toggleAutostop error:", err);
+      addToast("Failed to toggle auto-stop.", "error");
+    } finally {
+      mutate().then(() => setLastUpdated(new Date()));
+    }
+  };
+
+  const setMaintenance = async (hours: number) => {
+    try {
+      const res = await fetch("/api/autostop/maintenance", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ hours }),
+      });
+      if (!res.ok) throw new Error("Request failed");
+      const result = await res.json();
+      if (result.success) {
+        if (hours > 0) {
+          addToast(`Maintenance pause set for ${hours}h`, "info");
+          logActivity("refresh", "info", `Maintenance pause: ${hours}h`);
+        } else {
+          addToast("Maintenance resumed", "success");
+          logActivity("refresh", "info", "Maintenance resumed");
+        }
+      } else {
+        addToast(result.error || "Failed to set maintenance", "error");
+      }
+    } catch (err) {
+      console.error("[useServerStatus] setMaintenance error:", err);
+      addToast("Failed to set maintenance window.", "error");
+    } finally {
+      mutate().then(() => setLastUpdated(new Date()));
+    }
+  };
+
   return {
     status: data || null,
     isLoading: isLoading && !data,
@@ -184,5 +232,7 @@ export function useServerStatus() {
     refresh,
     activity,
     clearActivity,
+    toggleAutostop,
+    setMaintenance,
   };
 }
