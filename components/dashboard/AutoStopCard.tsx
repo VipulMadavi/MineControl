@@ -66,10 +66,10 @@ export function AutoStopCard({ autostop, onToggle, onSetMaintenance }: AutoStopC
 
   // Status indicator
   const statusConfig = !effectiveEnabled
-    ? { icon: ShieldOff, label: "OFF — server won't auto-stop", color: "text-rose-500", bg: "bg-rose-500/10", border: "border-rose-500/20" }
+    ? { icon: ShieldOff, label: "OFF — server runs until you stop it manually", color: "text-rose-500", bg: "bg-rose-500/10", border: "border-rose-500/20" }
     : inMaintenance
-    ? { icon: Wrench, label: `PAUSED until ${formatTime(autostop.maintenanceUntil!)} (${getTimeRemaining(autostop.maintenanceUntil!)})`, color: "text-amber-500 dark:text-amber-400", bg: "bg-amber-500/10", border: "border-amber-500/20" }
-    : { icon: ShieldCheck, label: "ON — server auto-stops when idle", color: "text-emerald-500 dark:text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20" };
+    ? { icon: Wrench, label: `Server kept alive until ${formatTime(autostop.maintenanceUntil!)} (${getTimeRemaining(autostop.maintenanceUntil!)}), then auto-stop kicks in`, color: "text-amber-500 dark:text-amber-400", bg: "bg-amber-500/10", border: "border-amber-500/20" }
+    : { icon: ShieldCheck, label: "ON — server auto-stops when no players are online", color: "text-emerald-500 dark:text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20" };
 
   const StatusIcon = statusConfig.icon;
 
@@ -113,10 +113,10 @@ export function AutoStopCard({ autostop, onToggle, onSetMaintenance }: AutoStopC
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex flex-col gap-0.5 min-w-0">
                     <span className="text-sm font-semibold text-amber-600 dark:text-amber-400">
-                      Maintenance pause active
+                      Server kept alive
                     </span>
                     <span className="text-[11px] text-muted-foreground/70">
-                      Auto-shutdown resumes at {formatTime(autostop.maintenanceUntil!)}
+                      Won&apos;t auto-stop until {formatTime(autostop.maintenanceUntil!)} — then normal rules apply again
                     </span>
                   </div>
                   <Button
@@ -125,13 +125,13 @@ export function AutoStopCard({ autostop, onToggle, onSetMaintenance }: AutoStopC
                     onClick={() => onSetMaintenance(0)}
                     className="h-8 text-xs font-semibold shrink-0"
                   >
-                    Resume Now
+                    Stop Protecting
                   </Button>
                 </div>
               ) : (
                 <>
                   <span className="text-xs font-medium text-muted-foreground/70">
-                    Pause auto-shutdown temporarily (auto-resumes after)
+                    Keep server alive for a while (auto-stop resumes after timer ends)
                   </span>
                   <div className="flex flex-wrap items-center gap-2">
                     {[1, 2, 4, 8].map((h) => (
