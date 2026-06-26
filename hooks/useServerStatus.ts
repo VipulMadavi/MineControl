@@ -189,34 +189,6 @@ export function useServerStatus() {
     }
   };
 
-  const setMaintenance = async (hours: number) => {
-    try {
-      const res = await fetch("/api/autostop/maintenance", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ hours }),
-      });
-      if (!res.ok) throw new Error("Request failed");
-      const result = await res.json();
-      if (result.success) {
-        if (hours > 0) {
-          addToast(`Paused for ${hours}h`, "info");
-          logActivity("refresh", "info", `Auto-shutdown paused: ${hours}h`);
-        } else {
-          addToast("Auto-shutdown resumed", "success");
-          logActivity("refresh", "info", "Auto-shutdown resumed");
-        }
-      } else {
-        addToast(result.error || "Failed to set maintenance", "error");
-      }
-    } catch (err) {
-      console.error("[useServerStatus] setMaintenance error:", err);
-      addToast("Failed to set maintenance window.", "error");
-    } finally {
-      mutate();
-    }
-  };
-
   return {
     status: data || null,
     isLoading: isLoading && !data,
@@ -233,6 +205,5 @@ export function useServerStatus() {
     activity,
     clearActivity,
     toggleAutostop,
-    setMaintenance,
   };
 }

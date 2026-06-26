@@ -1,6 +1,5 @@
 import { auth } from "@/auth";
 import { NextResponse } from "next/server";
-import { AUTH_BYPASS, MOCK_SESSION } from "@/lib/auth-bypass";
 import { loadConfig } from "@/lib/config";
 import { requireEnv } from "@/lib/env";
 import {
@@ -17,7 +16,7 @@ export const runtime = "nodejs";
 
 export async function GET() {
   // 1. Session authorization
-  const session = AUTH_BYPASS ? MOCK_SESSION : await auth();
+  const session = await auth();
   if (!session || !session.user?.isAuthorized) {
     return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
   }

@@ -2,7 +2,6 @@ import { GetParameterCommand, PutParameterCommand } from "@aws-sdk/client-ssm";
 import { getSSMClient } from "./clients";
 
 const PARAM_ENABLED = "/minecontrol/autostop/enabled";
-const PARAM_MAINTENANCE_UNTIL = "/minecontrol/maintenance-until";
 
 export interface AutostopState {
   enabled: boolean;
@@ -12,8 +11,8 @@ export interface AutostopState {
 }
 
 /**
- * Read autostop parameters from SSM Parameter Store.
- * Gracefully defaults to all-false on any failure (missing params, no creds, etc).
+ * Read autostop enabled state from SSM Parameter Store.
+ * Defaults to enabled on any failure (missing param, no creds, etc).
  */
 export async function getAutostopState(): Promise<AutostopState> {
   const defaults: AutostopState = {
@@ -25,29 +24,10 @@ export async function getAutostopState(): Promise<AutostopState> {
 
   try {
     const ssm = getSSMClient();
+    const res = await ssm.send(new GetParameterCommand({ Name: PARAM_ENABLED }));
+    const enabled = res.Parameter?.Value === "true";
 
-    const [enabledRes, maintenanceRes] = await Promise.allSettled([
-      ssm.send(new GetParameterCommand({ Name: PARAM_ENABLED })),
-      ssm.send(new GetParameterCommand({ Name: PARAM_MAINTENANCE_UNTIL })),
-    ]);
-
-    const enabledValue =
-      enabledRes.status === "fulfilled"
-        ? enabledRes.value.Parameter?.Value
-        : undefined;
-    const maintenanceValue =
-      maintenanceRes.status === "fulfilled"
-        ? maintenanceRes.value.Parameter?.Value
-        : undefined;
-
-    const enabled = enabledValue === "true";
-    const maintenanceUntil =
-      maintenanceValue && maintenanceValue.length > 0 ? maintenanceValue : null;
-    const inMaintenance =
-      !!maintenanceUntil && Date.now() < Date.parse(maintenanceUntil);
-    const active = enabled && !inMaintenance;
-
-    return { enabled, maintenanceUntil, inMaintenance, active };
+    return { enabled, maintenanceUntil: null, inMaintenance: false, active: enabled };
   } catch (error) {
     console.error("[parameter-store] getAutostopState failed:", (error as Error).message);
     return defaults;
@@ -63,22 +43,6 @@ export async function setAutostopEnabled(enabled: boolean): Promise<void> {
     new PutParameterCommand({
       Name: PARAM_ENABLED,
       Value: enabled ? "true" : "false",
-      Type: "String",
-      Overwrite: true,
-    })
-  );
-}
-
-/**
- * Set or clear the maintenance window.
- * Pass an ISO string to set, or null to clear.
- */
-export async function setMaintenanceUntil(iso: string | null): Promise<void> {
-  const ssm = getSSMClient();
-  await ssm.send(
-    new PutParameterCommand({
-      Name: PARAM_MAINTENANCE_UNTIL,
-      Value: iso || "",
       Type: "String",
       Overwrite: true,
     })

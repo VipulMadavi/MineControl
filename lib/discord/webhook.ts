@@ -168,17 +168,3 @@ export function logAutostopToggled(username: string, enabled: boolean) {
     ],
   });
 }
-
-export function logMaintenanceWindow(username: string, untilIso: string | null) {
-  return sendAuditLog({
-    title: untilIso ? "🔧 Maintenance Pause Set" : "▶️ Maintenance Resumed",
-    color: untilIso ? "warning" : "info",
-    fields: [
-      { name: "Changed By", value: username, inline: true },
-      ...(untilIso
-        ? [{ name: "Paused Until", value: new Date(untilIso).toUTCString(), inline: true }]
-        : []),
-      { name: "Time", value: new Date().toUTCString(), inline: false },
-    ],
-  });
-}
