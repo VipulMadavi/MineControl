@@ -156,3 +156,29 @@ export function logAwsError(context: string, reason: string) {
     ],
   });
 }
+
+export function logAutostopToggled(username: string, enabled: boolean) {
+  return sendAuditLog({
+    title: enabled ? "🟢 Auto-Stop Enabled" : "⛔ Auto-Stop Disabled",
+    color: enabled ? "success" : "warning",
+    fields: [
+      { name: "Changed By", value: username, inline: true },
+      { name: "New State", value: enabled ? "Enabled" : "Disabled", inline: true },
+      { name: "Time", value: new Date().toUTCString(), inline: false },
+    ],
+  });
+}
+
+export function logMaintenanceWindow(username: string, untilIso: string | null) {
+  return sendAuditLog({
+    title: untilIso ? "🔧 Maintenance Pause Set" : "▶️ Maintenance Resumed",
+    color: untilIso ? "warning" : "info",
+    fields: [
+      { name: "Changed By", value: username, inline: true },
+      ...(untilIso
+        ? [{ name: "Paused Until", value: new Date(untilIso).toUTCString(), inline: true }]
+        : []),
+      { name: "Time", value: new Date().toUTCString(), inline: false },
+    ],
+  });
+}
