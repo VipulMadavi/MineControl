@@ -51,7 +51,7 @@ export function ControlPanel({
       <CardContent className="flex flex-col gap-4 sm:gap-5 pt-2 pb-5 sm:pb-6">
         {/* Current Operation Status — only shown when operation is active */}
         {operationType && (
-          <div className="p-3 sm:p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 shadow-[0_0_15px_rgba(245,158,11,0.05)] flex flex-col gap-2 transition-all duration-300">
+          <div role="status" aria-live="polite" className="p-3 sm:p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 shadow-[0_0_15px_rgba(245,158,11,0.05)] flex flex-col gap-2 transition-all duration-300">
             <div className="flex items-center justify-between">
               <span className="text-[10px] uppercase font-bold text-amber-500 tracking-wider">Current Operation</span>
               <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping shrink-0" />
