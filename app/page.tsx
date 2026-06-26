@@ -28,7 +28,6 @@ export default function Home() {
     activity,
     clearActivity,
     toggleAutostop,
-    setMaintenance,
   } = useServerStatus();
 
   return (
@@ -105,7 +104,6 @@ export default function Home() {
                 <AutoStopCard
                   autostop={status.autostop}
                   onToggle={toggleAutostop}
-                  onSetMaintenance={setMaintenance}
                 />
               </div>
               <RecentActivity activity={activity} onClear={clearActivity} />
