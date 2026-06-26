@@ -54,3 +54,6 @@ ehthumbs.db
 
 # ─── DEV-ONLY: local auth bypass (never commit) ───────────────────────────────
 lib/auth-bypass.ts
+
+# ─── Reference docs (local only) ──────────────────────────────────────────────
+docs/
