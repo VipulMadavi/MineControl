@@ -25,6 +25,7 @@ export default function Home() {
     stopServer,
     refresh,
     activity,
+    clearActivity,
   } = useServerStatus();
 
   return (
@@ -99,7 +100,7 @@ export default function Home() {
                   lastUpdated={lastUpdated}
                 />
               </div>
-              <RecentActivity activity={activity} />
+              <RecentActivity activity={activity} onClear={clearActivity} />
             </div>
           </>
         )}

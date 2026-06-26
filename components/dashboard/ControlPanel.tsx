@@ -128,16 +128,18 @@ export function ControlPanel({
       </CardContent>
 
       {/* Last Updated footer */}
-      <CardFooter className="pt-0 pb-4 sm:pb-5 px-4 sm:px-6 flex items-center gap-1.5 border-t border-border/50 mt-auto flex-wrap">
-        <Clock className="w-3 h-3 text-muted-foreground/50 shrink-0" />
-        <span className="text-[11px] text-muted-foreground/50 font-normal">
-          {lastUpdated ? (
-            <>Last updated: <span className="font-mono">{formatTime(lastUpdated)}</span></>
-          ) : (
-            "Awaiting first refresh..."
-          )}
-        </span>
-        <span className="ml-auto text-[10px] text-muted-foreground/30 font-mono">Auto · 30s</span>
+      <CardFooter className="pt-3 pb-4 sm:pb-5 px-4 sm:px-6 flex items-center justify-between gap-2 border-t border-border/50 mt-auto">
+        <div className="flex items-center gap-1.5 min-w-0">
+          <Clock className="w-3 h-3 text-muted-foreground/50 shrink-0" />
+          <span className="text-[11px] text-muted-foreground/50 font-normal truncate">
+            {lastUpdated ? (
+              <>Last updated: <span className="font-mono">{formatTime(lastUpdated)}</span></>
+            ) : (
+              "Awaiting first refresh..."
+            )}
+          </span>
+        </div>
+        <span className="text-[10px] text-muted-foreground/40 font-mono shrink-0">Auto · 30s</span>
       </CardFooter>
 
       <ConfirmDialog

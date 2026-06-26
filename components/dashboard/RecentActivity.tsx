@@ -8,6 +8,7 @@ import type { ActivityItem } from "@/hooks/useActivityLog";
 
 interface RecentActivityProps {
   activity: ActivityItem[];
+  onClear?: () => void;
 }
 
 /** Visual mapping for an activity entry, derived from its kind + status. */
@@ -41,7 +42,7 @@ function getVisual(item: ActivityItem) {
   }
 }
 
-export function RecentActivity({ activity }: RecentActivityProps) {
+export function RecentActivity({ activity, onClear }: RecentActivityProps) {
   return (
     <Card className="bg-card/40 border-border backdrop-blur-md h-full flex flex-col rounded-xl">
       <CardHeader className="pb-4">
@@ -53,6 +54,14 @@ export function RecentActivity({ activity }: RecentActivityProps) {
         <CardDescription className="text-xs text-muted-foreground/80 font-normal leading-relaxed">
           Server operations performed from this device.
         </CardDescription>
+        {activity.length > 0 && onClear && (
+          <button
+            onClick={onClear}
+            className="mt-2 self-start px-2.5 py-1 text-[10px] font-semibold rounded-md border border-border bg-muted/60 text-muted-foreground hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition-all cursor-pointer"
+          >
+            Clear log
+          </button>
+        )}
       </CardHeader>
 
       <CardContent className="mt-2 pb-6 flex-1">

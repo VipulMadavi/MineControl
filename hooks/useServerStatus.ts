@@ -101,8 +101,9 @@ export function useServerStatus() {
   };
 
   const refresh = useCallback(() => {
+    logActivity("refresh", "info", "Status refreshed");
     mutate().then(() => setLastUpdated(new Date()));
-  }, [mutate]);
+  }, [mutate, logActivity]);
 
   const startServer = async () => {
     if (operationType) return;
