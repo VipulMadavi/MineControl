@@ -17,10 +17,10 @@ export interface AutostopState {
  */
 export async function getAutostopState(): Promise<AutostopState> {
   const defaults: AutostopState = {
-    enabled: false,
+    enabled: true,
     maintenanceUntil: null,
     inMaintenance: false,
-    active: false,
+    active: true,
   };
 
   try {

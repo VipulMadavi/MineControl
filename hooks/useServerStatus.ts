@@ -176,16 +176,16 @@ export function useServerStatus() {
       const result = await res.json();
       if (result.success) {
         const state = result.enabled ? "enabled" : "disabled";
-        addToast(`Auto-stop ${state}`, result.enabled ? "success" : "warning");
-        logActivity("refresh", "info", `Auto-stop ${state}`);
+        addToast(`Auto-shutdown ${state}`, result.enabled ? "success" : "warning");
+        logActivity("refresh", "info", `Auto-shutdown ${state}`);
       } else {
-        addToast(result.error || "Failed to toggle auto-stop", "error");
+        addToast(result.error || "Failed to toggle auto-shutdown", "error");
       }
     } catch (err) {
       console.error("[useServerStatus] toggleAutostop error:", err);
-      addToast("Failed to toggle auto-stop.", "error");
+      addToast("Failed to toggle auto-shutdown.", "error");
     } finally {
-      mutate().then(() => setLastUpdated(new Date()));
+      mutate();
     }
   };
 
@@ -200,11 +200,11 @@ export function useServerStatus() {
       const result = await res.json();
       if (result.success) {
         if (hours > 0) {
-          addToast(`Maintenance pause set for ${hours}h`, "info");
-          logActivity("refresh", "info", `Maintenance pause: ${hours}h`);
+          addToast(`Paused for ${hours}h`, "info");
+          logActivity("refresh", "info", `Auto-shutdown paused: ${hours}h`);
         } else {
-          addToast("Maintenance resumed", "success");
-          logActivity("refresh", "info", "Maintenance resumed");
+          addToast("Auto-shutdown resumed", "success");
+          logActivity("refresh", "info", "Auto-shutdown resumed");
         }
       } else {
         addToast(result.error || "Failed to set maintenance", "error");
@@ -213,7 +213,7 @@ export function useServerStatus() {
       console.error("[useServerStatus] setMaintenance error:", err);
       addToast("Failed to set maintenance window.", "error");
     } finally {
-      mutate().then(() => setLastUpdated(new Date()));
+      mutate();
     }
   };
 
