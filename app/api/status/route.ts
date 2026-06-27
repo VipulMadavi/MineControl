@@ -4,7 +4,8 @@ import { loadConfig } from "@/lib/config";
 import { requireEnv } from "@/lib/env";
 import {
   getInstanceStatus,
-  getMinecraftInfo
+  getMinecraftInfo,
+  getAutostopState,
 } from "@/lib/aws";
 import { ServerStatusSchema } from "@/types";
 import { formatUptime } from "@/lib/format-uptime";
@@ -44,6 +45,15 @@ export async function GET() {
       minecraftState = minecraftInfo.online ? "online" : "offline";
     }
 
+    // 4. Autostop state (isolated — never breaks status)
+    let autostop = { enabled: false, maintenanceUntil: null as string | null, active: false };
+    try {
+      const state = await getAutostopState();
+      autostop = { enabled: state.enabled, maintenanceUntil: state.maintenanceUntil, active: state.active };
+    } catch (e) {
+      console.error("[api/status] Autostop read failed:", (e as Error).message);
+    }
+
     const statusData = {
       ec2: {
         state: ec2Info.state,
@@ -55,6 +65,7 @@ export async function GET() {
         maxPlayers: minecraftInfo.maxPlayers,
         latency: minecraftInfo.latency,
       },
+      autostop,
     };
 
     const validated = ServerStatusSchema.parse(statusData);

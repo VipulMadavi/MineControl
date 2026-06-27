@@ -1,7 +1,10 @@
+"use client";
+
 import * as React from "react";
 import { ServerStatus } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { ConfirmDialog } from "@/components/ui/alert-dialog";
 import { RefreshCw, Sliders, Clock } from "lucide-react";
 
 interface ControlPanelProps {
@@ -26,6 +29,7 @@ export function ControlPanel({
   lastUpdated = null,
 }: ControlPanelProps) {
   const { ec2, minecraft } = status;
+  const [confirmStopOpen, setConfirmStopOpen] = React.useState(false);
 
   const formatTime = (date: Date) =>
     date.toLocaleTimeString("en-IN", {
@@ -51,7 +55,7 @@ export function ControlPanel({
       <CardContent className="flex flex-col gap-4 sm:gap-5 pt-2 pb-5 sm:pb-6">
         {/* Current Operation Status — only shown when operation is active */}
         {operationType && (
-          <div className="p-3 sm:p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 shadow-[0_0_15px_rgba(245,158,11,0.05)] flex flex-col gap-2 transition-all duration-300">
+          <div role="status" aria-live="polite" className="p-3 sm:p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 shadow-[0_0_15px_rgba(245,158,11,0.05)] flex flex-col gap-2 transition-all duration-300">
             <div className="flex items-center justify-between">
               <span className="text-[10px] uppercase font-bold text-amber-500 tracking-wider">Current Operation</span>
               <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping shrink-0" />
@@ -95,7 +99,7 @@ export function ControlPanel({
           {/* Stop Server */}
           <Button
             id="btn-stop-server"
-            onClick={onStop}
+            onClick={() => setConfirmStopOpen(true)}
             disabled={ec2.state !== "running" || minecraft.state !== "online" || isRefreshing || operationType !== null}
             variant="destructive"
             className="h-12 sm:h-12 bg-rose-600/90 hover:bg-rose-500 text-white disabled:bg-neutral-200 dark:disabled:bg-neutral-800/80 disabled:text-neutral-400 dark:disabled:text-neutral-500 transition-all font-semibold gap-2 rounded-lg cursor-pointer text-sm touch-manipulation"
@@ -124,17 +128,36 @@ export function ControlPanel({
       </CardContent>
 
       {/* Last Updated footer */}
-      <CardFooter className="pt-0 pb-4 sm:pb-5 px-4 sm:px-6 flex items-center gap-1.5 border-t border-border/50 mt-auto flex-wrap">
-        <Clock className="w-3 h-3 text-muted-foreground/50 shrink-0" />
-        <span className="text-[11px] text-muted-foreground/50 font-normal">
-          {lastUpdated ? (
-            <>Last updated: <span className="font-mono">{formatTime(lastUpdated)}</span></>
-          ) : (
-            "Awaiting first refresh..."
-          )}
-        </span>
-        <span className="ml-auto text-[10px] text-muted-foreground/30 font-mono">Auto · 30s</span>
+      <CardFooter className="pt-3 pb-4 sm:pb-5 px-4 sm:px-6 flex items-center justify-between gap-2 border-t border-border/50 mt-auto">
+        <div className="flex items-center gap-1.5 min-w-0">
+          <Clock className="w-3 h-3 text-muted-foreground/50 shrink-0" />
+          <span className="text-[11px] text-muted-foreground/50 font-normal truncate">
+            {lastUpdated ? (
+              <>Last updated: <span className="font-mono">{formatTime(lastUpdated)}</span></>
+            ) : (
+              "Awaiting first refresh..."
+            )}
+          </span>
+        </div>
+        <span className="text-[10px] text-muted-foreground/40 font-mono shrink-0">Auto · 30s</span>
       </CardFooter>
+
+      <ConfirmDialog
+        open={confirmStopOpen}
+        onOpenChange={setConfirmStopOpen}
+        title="Stop the Minecraft server?"
+        description={
+          <>
+            This will stop the Minecraft application and shut down the EC2
+            instance ({ec2.state} / {minecraft.state}). Players will be
+            disconnected and the world saved before shutdown.
+          </>
+        }
+        confirmLabel="Stop Server"
+        cancelLabel="Cancel"
+        destructive
+        onConfirm={onStop}
+      />
     </Card>
   );
 }

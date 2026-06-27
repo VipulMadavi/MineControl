@@ -6,6 +6,8 @@ import { useServerStatus } from "@/hooks/useServerStatus";
 import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
 import { ControlPanel } from "@/components/dashboard/ControlPanel";
 import { EC2InstanceCard } from "@/components/dashboard/EC2InstanceCard";
+import { RecentActivity } from "@/components/dashboard/RecentActivity";
+import { AutoStopCard } from "@/components/dashboard/AutoStopCard";
 import { DashboardSkeleton } from "@/components/dashboard/DashboardSkeleton";
 import { UserMenu } from "@/components/user-menu";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -23,6 +25,9 @@ export default function Home() {
     startServer,
     stopServer,
     refresh,
+    activity,
+    clearActivity,
+    toggleAutostop,
   } = useServerStatus();
 
   return (
@@ -61,14 +66,14 @@ export default function Home() {
         {isLoading ? (
           <DashboardSkeleton />
         ) : error ? (
-          <div className="flex-1 flex flex-col items-center justify-center gap-4 py-16 sm:py-20 bg-neutral-900/10 border border-neutral-850 rounded-2xl backdrop-blur-sm mx-0">
-            <div className="p-3 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400">
+          <div className="flex-1 flex flex-col items-center justify-center gap-4 py-16 sm:py-20 bg-card/40 border border-border rounded-2xl backdrop-blur-sm mx-0" role="alert">
+            <div className="p-3 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-500 dark:text-rose-400">
               <Server className="w-7 h-7 sm:w-8 sm:h-8" />
             </div>
-            <p className="text-rose-400 font-medium text-sm sm:text-base text-center px-4">{error}</p>
+            <p className="text-rose-500 dark:text-rose-400 font-medium text-sm sm:text-base text-center px-4">{error}</p>
             <button
               onClick={refresh}
-              className="mt-2 px-5 py-2.5 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 hover:text-neutral-50 rounded-lg border border-neutral-700 hover:border-neutral-600 transition-all font-semibold cursor-pointer text-sm"
+              className="mt-2 px-5 py-2.5 bg-muted hover:bg-accent text-foreground rounded-lg border border-border hover:border-foreground/30 transition-all font-semibold cursor-pointer text-sm focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
             >
               Retry
             </button>
@@ -83,40 +88,59 @@ export default function Home() {
             {/* Full-width EC2 Card */}
             <EC2InstanceCard status={status} />
 
-            {/* Full-width Operations Panel */}
-            <ControlPanel
-              status={status}
-              onStart={startServer}
-              onStop={stopServer}
-              onRefresh={refresh}
-              isRefreshing={isLoading}
-              operationType={operationType}
-              operationStep={operationStep}
-              lastUpdated={lastUpdated}
-            />
+            {/* Auto-Stop + Control Panel + Activity — responsive grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 sm:gap-6 md:gap-8 items-start">
+              <div className="lg:col-span-2 flex flex-col gap-5 sm:gap-6 md:gap-8">
+                <ControlPanel
+                  status={status}
+                  onStart={startServer}
+                  onStop={stopServer}
+                  onRefresh={refresh}
+                  isRefreshing={isLoading}
+                  operationType={operationType}
+                  operationStep={operationStep}
+                  lastUpdated={lastUpdated}
+                />
+                <AutoStopCard
+                  autostop={status.autostop}
+                  onToggle={toggleAutostop}
+                />
+              </div>
+              <RecentActivity activity={activity} onClear={clearActivity} />
+            </div>
           </>
         )}
 
       </main>
 
       {/* Floating toast notifications */}
-      <div className="fixed bottom-4 right-4 sm:bottom-5 sm:right-5 z-50 flex flex-col gap-2 w-[calc(100vw-2rem)] max-w-sm pointer-events-none">
+      <div
+        role="status"
+        aria-live="polite"
+        className="fixed bottom-4 right-4 sm:bottom-5 sm:right-5 z-50 flex flex-col gap-2 w-[calc(100vw-2rem)] max-w-sm pointer-events-none"
+      >
         {toasts.map((toast) => (
           <div
             key={toast.id}
             onClick={() => removeToast(toast.id)}
             className={`p-3 sm:p-4 rounded-xl border shadow-xl flex items-center justify-between pointer-events-auto cursor-pointer transition-all duration-300 hover:scale-[1.02] ${
               toast.type === "success"
-                ? "bg-emerald-950/90 border-emerald-500/30 text-emerald-400"
+                ? "bg-emerald-50 dark:bg-emerald-950/90 border-emerald-500/30 text-emerald-700 dark:text-emerald-400"
                 : toast.type === "error"
-                ? "bg-rose-950/90 border-rose-500/30 text-rose-400"
+                ? "bg-rose-50 dark:bg-rose-950/90 border-rose-500/30 text-rose-700 dark:text-rose-400"
                 : toast.type === "warning"
-                ? "bg-amber-950/90 border-amber-500/30 text-amber-400"
-                : "bg-cyan-950/90 border-cyan-500/30 text-cyan-400"
+                ? "bg-amber-50 dark:bg-amber-950/90 border-amber-500/30 text-amber-700 dark:text-amber-400"
+                : "bg-cyan-50 dark:bg-cyan-950/90 border-cyan-500/30 text-cyan-700 dark:text-cyan-400"
             }`}
           >
             <span className="text-xs sm:text-sm font-semibold leading-snug pr-2">{toast.message}</span>
-            <button className="text-xs opacity-60 hover:opacity-100 font-bold font-mono shrink-0">×</button>
+            <button
+              type="button"
+              aria-label="Dismiss notification"
+              className="text-xs opacity-60 hover:opacity-100 font-bold font-mono shrink-0"
+            >
+              ×
+            </button>
           </div>
         ))}
       </div>

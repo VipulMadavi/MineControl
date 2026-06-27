@@ -20,20 +20,20 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex-1 flex items-center justify-center min-h-screen bg-neutral-950 text-neutral-50 relative overflow-hidden px-4">
+    <div className="flex-1 flex items-center justify-center min-h-screen bg-background text-foreground relative overflow-hidden px-4">
       {/* Decorative radial gradients */}
       <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-emerald-500/10 blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-500/10 blur-[120px] pointer-events-none" />
 
-      <Card className="w-full max-w-md bg-neutral-900/40 border-neutral-800 backdrop-blur-md shadow-2xl relative z-10 hover:border-neutral-750 transition-all duration-300">
+      <Card className="w-full max-w-md bg-card/60 border-border backdrop-blur-md shadow-2xl relative z-10 hover:border-foreground/20 transition-all duration-300">
         <CardHeader className="text-center pb-4">
           <div className="mx-auto w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mb-4 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
             <Server className="w-6 h-6 animate-pulse" />
           </div>
-          <CardTitle className="text-3xl font-semibold tracking-tight bg-gradient-to-r from-neutral-50 via-neutral-100 to-neutral-400 bg-clip-text text-transparent">
+          <CardTitle className="text-3xl font-semibold tracking-tight bg-gradient-to-r from-foreground via-foreground to-muted-foreground bg-clip-text text-transparent">
             MineControl
           </CardTitle>
-          <CardDescription className="text-neutral-400 text-sm mt-1.5 font-normal">
+          <CardDescription className="text-muted-foreground text-sm mt-1.5 font-normal">
             Manage your Minecraft server.
           </CardDescription>
         </CardHeader>
@@ -53,7 +53,7 @@ export default function LoginPage() {
           </Button>
         </CardContent>
 
-        <CardFooter className="border-t border-neutral-900 bg-black/20 p-4 text-center text-xs text-neutral-500 rounded-b-xl flex items-center justify-center">
+        <CardFooter className="border-t border-border bg-muted/30 p-4 text-center text-xs text-muted-foreground rounded-b-xl flex items-center justify-center">
           Secure OAuth access controlled by config permissions.
         </CardFooter>
       </Card>

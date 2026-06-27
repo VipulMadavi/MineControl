@@ -18,6 +18,13 @@ export const MinecraftStateSchema = z.enum([
 ]);
 export type MinecraftState = z.infer<typeof MinecraftStateSchema>;
 
+export const AutostopStatusSchema = z.object({
+  enabled: z.boolean(),
+  maintenanceUntil: z.string().nullable(),
+  active: z.boolean(),
+});
+export type AutostopStatus = z.infer<typeof AutostopStatusSchema>;
+
 export const ServerStatusSchema = z.object({
   ec2: z.object({
     state: EC2StateSchema,
@@ -29,6 +36,7 @@ export const ServerStatusSchema = z.object({
     maxPlayers: z.number().int().nonnegative(),
     latency: z.number().int().nullable(),
   }),
+  autostop: AutostopStatusSchema,
 });
 export type ServerStatus = z.infer<typeof ServerStatusSchema>;
 

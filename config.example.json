@@ -1,0 +1,26 @@
+{
+    "autostop": {
+        "enabled": true,
+        "max_idle_ticks": 3
+    },
+    "minecraft": {
+        "bot_id": "YOUR_BOT_ID",
+        "chat_channel": "YOUR_CHAT_CHANNEL_ID",
+        "command_channel": "YOUR_COMMAND_CHANNEL_ID",
+        "server_address": "YOUR_SERVER_IP:25565"
+    },
+    "discord": {
+        "control_panel_channel": "YOUR_CONTROL_PANEL_CHANNEL_ID",
+        "log_channel": "YOUR_LOG_CHANNEL_ID"
+    },
+    "permissions": {
+        "authorized_users": [
+            "DISCORD_USER_ID_1",
+            "DISCORD_USER_ID_2"
+        ]
+    },
+    "timeouts": {
+        "startup_wait_seconds": 300,
+        "ssm_wait_seconds": 60
+    }
+}
