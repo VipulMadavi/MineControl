@@ -81,7 +81,11 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## User Allowlist
 
-Edit `config.json` to add authorized Discord user IDs:
+Copy `config.example.json` to `config.json` and add authorized Discord user IDs:
+
+```bash
+cp config.example.json config.json
+```
 
 ```json
 {
@@ -92,6 +96,8 @@ Edit `config.json` to add authorized Discord user IDs:
   }
 }
 ```
+
+> **Note**: `config.json` is gitignored — it stays local. See `config.example.json` for the full template.
 
 Find your Discord user ID: Settings → Advanced → Enable Developer Mode → right-click your name → Copy ID.
 
@@ -141,7 +147,9 @@ The IAM user needs these permissions:
         "ec2:StopInstances",
         "ssm:SendCommand",
         "ssm:GetCommandInvocation",
-        "ssm:DescribeInstanceInformation"
+        "ssm:DescribeInstanceInformation",
+        "ssm:GetParameter",
+        "ssm:PutParameter"
       ],
       "Resource": "*"
     }
@@ -157,9 +165,10 @@ All endpoints require authentication.
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/api/status` | Query EC2 and Minecraft status |
+| `GET` | `/api/status` | Query EC2, Minecraft status, and auto-shutdown state |
 | `POST` | `/api/start` | Start EC2 and Minecraft server |
 | `POST` | `/api/stop` | Stop Minecraft and EC2 instance |
+| `POST` | `/api/autostop/toggle` | Toggle auto-shutdown on/off |
 
 ### Response format
 
@@ -177,5 +186,11 @@ All endpoints require authentication.
 - [AWS SDK v3](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/) — EC2 + SSM
 - [SWR](https://swr.vercel.app) — Data fetching
 - [Tailwind CSS](https://tailwindcss.com) — Styling
-- [shadcn/ui](https://ui.shadcn.com) — Component library
+- [Base UI](https://base-ui.com) — Headless component primitives
 - [next-themes](https://github.com/pacocoursey/next-themes) — Theme system
+
+---
+
+## Acknowledgments
+
+Built with the help of AI (Claude) for code generation, UI design, and architecture decisions. All code reviewed and validated by humans before shipping.
