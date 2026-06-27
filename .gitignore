@@ -57,3 +57,6 @@ lib/auth-bypass.ts
 
 # ─── Reference docs (local only) ──────────────────────────────────────────────
 docs/
+
+# ─── Runtime config (contains IPs, Discord IDs) ───────────────────────────────
+config.json

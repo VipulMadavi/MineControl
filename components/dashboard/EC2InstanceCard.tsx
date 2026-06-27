@@ -51,7 +51,7 @@ export function EC2InstanceCard({ status }: EC2InstanceCardProps) {
             </div>
             <div className="min-w-0">
               <p className="text-xs font-semibold text-foreground leading-none">Virtual Machine Instance</p>
-              <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-wider font-mono truncate">i-09f187a552b96fd4b</p>
+              <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-wider font-mono truncate">{status.ec2.state === "running" ? "Connected" : "Disconnected"}</p>
             </div>
           </div>
 
@@ -91,7 +91,7 @@ export function EC2InstanceCard({ status }: EC2InstanceCardProps) {
             </div>
             <div className="min-w-0">
               <p className="text-xs font-semibold text-foreground leading-none">Minecraft Server Application</p>
-              <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-wider font-mono">Port 31121</p>
+              <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-wider font-mono">MC Port</p>
             </div>
           </div>
         </div>
@@ -138,7 +138,7 @@ export function EC2InstanceCard({ status }: EC2InstanceCardProps) {
             <span className="text-[10px] uppercase font-semibold text-muted-foreground/60 tracking-wider">SSH Key Pair</span>
             <div className="flex items-center gap-1.5 h-6 text-sm font-semibold text-foreground/80">
               <Key className="w-4 h-4 text-neutral-400 shrink-0" />
-              <span className="truncate">minecontrol-prod</span>
+              <span className="truncate">minecontrol</span>
             </div>
           </div>
 

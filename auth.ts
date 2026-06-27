@@ -97,5 +97,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     signIn: "/login",
     error: "/login",
   },
-  secret: process.env.NEXTAUTH_SECRET || "default_local_secret_placeholder_32_chars_long",
+  secret: (() => {
+    if (process.env.NEXTAUTH_SECRET) return process.env.NEXTAUTH_SECRET;
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("NEXTAUTH_SECRET is required in production");
+    }
+    return "dev-only-secret-not-for-production-use";
+  })(),
 });
